@@ -598,7 +598,7 @@ local playersWithoutEsp = {}
 local localPlayer = game.Players.LocalPlayer
 local gameCamera = game.Workspace.CurrentCamera
 
-local PLAYER_MAX_TEXT_SIZE = 60 -- Tamaño máximo del texto
+local PLAYER_MAX_TEXT_SIZE = 70 -- Tamaño máximo del texto
 local PLAYER_MIN_TEXT_SIZE = 35 -- Tamaño mínimo del texto
 local PLAYER_DISTANCE_THRESHOLD = 200 -- Distancia donde el texto es más pequeño
 
