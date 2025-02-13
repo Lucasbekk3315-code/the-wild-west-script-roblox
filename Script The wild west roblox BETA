@@ -144,6 +144,30 @@ EspBisonteButton.Font = Enum.Font.SourceSansBold
 EspBisonteButton.TextSize = 24
 EspBisonteButton.Visible = false
 
+local EspCocodriloButton = Instance.new("TextButton")
+EspCocodriloButton.Parent = MainFrame
+EspCocodriloButton.AnchorPoint = Vector2.new(0.5, 0.5) -- Corregido
+EspCocodriloButton.Size = UDim2.new(0.39, 0, 0.16, 0)
+EspCocodriloButton.Position = UDim2.new(0.3, 0, 0.43, 0)
+EspCocodriloButton.Text = "Esp De Cocodrilo"
+EspCocodriloButton.BackgroundColor3 = Color3.fromRGB(65, 65, 65)
+EspCocodriloButton.TextColor3 = Color3.new(1, 1, 1)
+EspCocodriloButton.Font = Enum.Font.SourceSansBold
+EspCocodriloButton.TextSize = 24
+EspCocodriloButton.Visible = false
+
+local EspPlayerButton = Instance.new("TextButton")
+EspPlayerButton.Parent = MainFrame
+EspPlayerButton.AnchorPoint = Vector2.new(0.5, 0.5) -- Corregido
+EspPlayerButton.Size = UDim2.new(0.39, 0, 0.16, 0)
+EspPlayerButton.Position = UDim2.new(0.7, 0, 0.43, 0)
+EspPlayerButton.Text = "Esp De Jugador"
+EspPlayerButton.BackgroundColor3 = Color3.fromRGB(65, 65, 65)
+EspPlayerButton.TextColor3 = Color3.new(1, 1, 1)
+EspPlayerButton.Font = Enum.Font.SourceSansBold
+EspPlayerButton.TextSize = 24
+EspPlayerButton.Visible = false
+
 -- Configuración de BackButton
 local BackButton = Instance.new("TextButton")
 BackButton.Parent = MainFrame
@@ -442,6 +466,268 @@ end)
 
 
 
+local cocodrileEspEnabled = false
+local cocodrileEspObjects = {}
+local cocodrileWithEsp = {}
+local cocodrileWithoutEsp = {}
+
+local cocodrilePlayers = {} -- Lista de jugadores con ESP de cocodrilos
+local cocodrilePlayer = game.Players.LocalPlayer
+local cocodrileCamera = game.Workspace.CurrentCamera
+
+local COCODRILE_MAX_TEXT_SIZE = 45 -- Tamaño máximo del texto para cocodrilos
+local COCODRILE_MIN_TEXT_SIZE = 30 -- Tamaño mínimo del texto para cocodrilos
+local COCODRILE_DISTANCE_THRESHOLD = 300 -- Distancia donde el texto es más pequeño
+
+local function updateCocodrileLists()
+    cocodrileWithEsp = {}
+    cocodrileWithoutEsp = {}
+    for _, model in ipairs(workspace.WORKSPACE_Entities.Animals:GetChildren()) do
+        if model:IsA("Model") and model.Name == "Gator" then
+            if cocodrileEspObjects[model] then
+                table.insert(cocodrileWithEsp, model)
+            else
+                table.insert(cocodrileWithoutEsp, model)
+            end
+        end
+    end
+    print("Con ESP:", #cocodrileWithEsp)
+    print("Sin ESP:", #cocodrileWithoutEsp)
+end
+
+local function updateCocodrileTextSize(billboard, primaryPart)
+    local distance = (cocodrileCamera.CFrame.Position - primaryPart.Position).magnitude
+    local sizeRatio = math.clamp(distance / COCODRILE_DISTANCE_THRESHOLD, 0, 1)
+    local newSize = math.clamp(COCODRILE_MIN_TEXT_SIZE + sizeRatio * (COCODRILE_MAX_TEXT_SIZE - COCODRILE_MIN_TEXT_SIZE), COCODRILE_MIN_TEXT_SIZE, COCODRILE_MAX_TEXT_SIZE)
+    billboard.Size = UDim2.new(0, newSize, 0, newSize)
+end
+
+local function createCocodrileEsp(model)
+    if not model:IsA("Model") then return end
+    local primaryPart = model.PrimaryPart or model:FindFirstChildWhichIsA("BasePart")
+    if not primaryPart then return end
+    
+    -- Crear la caja ESP para cocodrilos
+    local cocodrileBox = Instance.new("BoxHandleAdornment")
+    cocodrileBox.Size = primaryPart.Size + Vector3.new(1, 1, 1)
+    cocodrileBox.Color3 = Color3.fromRGB(255, 255, 0) -- Amarillo
+    cocodrileBox.Adornee = primaryPart
+    cocodrileBox.AlwaysOnTop = true
+    cocodrileBox.ZIndex = 5
+    cocodrileBox.Transparency = 0.3
+    cocodrileBox.Parent = primaryPart
+    
+    -- Crear el texto para cocodrilos
+    local cocodrileBillboard = Instance.new("BillboardGui")
+    cocodrileBillboard.Size = UDim2.new(0, COCODRILE_MAX_TEXT_SIZE, 0, COCODRILE_MAX_TEXT_SIZE)
+    cocodrileBillboard.StudsOffset = Vector3.new(0, 5, 0)
+    cocodrileBillboard.Adornee = primaryPart
+    cocodrileBillboard.AlwaysOnTop = true
+    cocodrileBillboard.MaxDistance = math.huge
+    cocodrileBillboard.Parent = primaryPart
+    
+    local cocodrileTextLabel = Instance.new("TextLabel")
+    cocodrileTextLabel.Size = UDim2.new(1, 0, 1, 0)
+    cocodrileTextLabel.BackgroundTransparency = 1
+    cocodrileTextLabel.Text = "Cocodrilo"
+    cocodrileTextLabel.TextColor3 = Color3.new(1, 1, 0) -- Amarillo
+    cocodrileTextLabel.TextScaled = true
+    cocodrileTextLabel.Font = Enum.Font.SourceSansBold
+    cocodrileTextLabel.Parent = cocodrileBillboard
+    
+    -- Actualizar el tamaño del texto
+    updateCocodrileTextSize(cocodrileBillboard, primaryPart)
+
+    -- Conectar la actualización del tamaño del texto cada frame
+    game:GetService("RunService").RenderStepped:Connect(function()
+        updateCocodrileTextSize(cocodrileBillboard, primaryPart)
+    end)
+
+    cocodrileEspObjects[model] = {cocodrileBox, cocodrileBillboard}
+    updateCocodrileLists()
+end
+
+local function removeCocodrileEsp()
+    for model, objects in pairs(cocodrileEspObjects) do
+        for _, obj in ipairs(objects) do
+            obj:Destroy()
+        end
+        cocodrileEspObjects[model] = nil
+    end
+    updateCocodrileLists()
+end
+
+-- Detectar si se añaden nuevos "Cocodrile"
+local function monitorCocodrileEntities()
+    -- Verificar por "Cocodrile" ya existentes al principio
+    for _, model in ipairs(workspace.WORKSPACE_Entities.Animals:GetChildren()) do
+        if model:IsA("Model") and model.Name == "Cocodrile" and not cocodrileEspObjects[model] then
+            createCocodrileEsp(model)
+        end
+    end
+
+    -- Escuchar si nuevos "Cocodrile" aparecen
+    game:GetService("RunService").Heartbeat:Connect(function()
+        if cocodrileEspEnabled then
+            for _, model in ipairs(workspace.WORKSPACE_Entities.Animals:GetChildren()) do
+                if model:IsA("Model") and model.Name == "Gator" and not cocodrileEspObjects[model] then
+                    createCocodrileEsp(model)
+                end
+            end
+        end
+    end)
+end
+
+-- Botón para habilitar/deshabilitar ESP
+EspCocodriloButton.MouseButton1Click:Connect(function()
+    cocodrileEspEnabled = not cocodrileEspEnabled
+    if cocodrileEspEnabled then
+        monitorCocodrileEntities() -- Comienza a monitorear los "Cocodrile"
+    else
+        removeCocodrileEsp() -- Elimina el ESP de todos los "Cocodrile"
+    end
+end)
+
+
+
+local playerEspEnabled = false
+local playerEspObjects = {}
+local playersWithEsp = {}
+local playersWithoutEsp = {}
+
+local localPlayer = game.Players.LocalPlayer
+local gameCamera = game.Workspace.CurrentCamera
+
+local PLAYER_MAX_TEXT_SIZE = 60 -- Tamaño máximo del texto
+local PLAYER_MIN_TEXT_SIZE = 35 -- Tamaño mínimo del texto
+local PLAYER_DISTANCE_THRESHOLD = 200 -- Distancia donde el texto es más pequeño
+
+local function getPlayerColor(player)
+    if player.Team then
+        if player.Team.Name == "Citizens" then
+            return Color3.fromRGB(0, 255, 0) -- Verde para Citizens
+        elseif player.Team.Name == "Outlaws" then
+            return Color3.fromRGB(255, 0, 0) -- Rojo para Outlaws
+        end
+    end
+    return Color3.fromRGB(255, 255, 255) -- Blanco por defecto si no tiene equipo
+end
+
+local function updatePlayerLists()
+    playersWithEsp = {}
+    playersWithoutEsp = {}
+    for _, model in ipairs(workspace.WORKSPACE_Entities.Players:GetChildren()) do
+        if model:IsA("Model") and model.Name ~= localPlayer.Name then
+            if playerEspObjects[model] then
+                table.insert(playersWithEsp, model)
+            else
+                table.insert(playersWithoutEsp, model)
+            end
+        end
+    end
+    print("Con ESP:", #playersWithEsp)
+    print("Sin ESP:", #playersWithoutEsp)
+end
+
+local function updatePlayerTextSize(billboard, primaryPart)
+    local distance = (gameCamera.CFrame.Position - primaryPart.Position).magnitude
+    local sizeRatio = math.clamp(distance / PLAYER_DISTANCE_THRESHOLD, 0, 1)
+    local newSize = math.clamp(PLAYER_MIN_TEXT_SIZE + sizeRatio * (PLAYER_MAX_TEXT_SIZE - PLAYER_MIN_TEXT_SIZE), PLAYER_MIN_TEXT_SIZE, PLAYER_MAX_TEXT_SIZE)
+    billboard.Size = UDim2.new(0, newSize, 0, newSize)
+end
+
+local function createPlayerEsp(model)
+    if not model:IsA("Model") or model.Name == localPlayer.Name then return end
+    local primaryPart = model.PrimaryPart or model:FindFirstChildWhichIsA("BasePart")
+    if not primaryPart then return end
+    
+    local player = game.Players:FindFirstChild(model.Name)
+    if not player then return end
+    local espColor = getPlayerColor(player)
+
+    -- Crear la caja ESP para jugadores
+    local playerBox = Instance.new("BoxHandleAdornment")
+    playerBox.Size = primaryPart.Size + Vector3.new(1, 1, 1)
+    playerBox.Color3 = espColor
+    playerBox.Adornee = primaryPart
+    playerBox.AlwaysOnTop = true
+    playerBox.ZIndex = 5
+    playerBox.Transparency = 0.3
+    playerBox.Parent = primaryPart
+    
+    -- Crear el texto sobre los jugadores
+    local playerBillboard = Instance.new("BillboardGui")
+    playerBillboard.Size = UDim2.new(0, PLAYER_MAX_TEXT_SIZE, 0, PLAYER_MAX_TEXT_SIZE)
+    playerBillboard.StudsOffset = Vector3.new(0, 5, 0)
+    playerBillboard.Adornee = primaryPart
+    playerBillboard.AlwaysOnTop = true
+    playerBillboard.MaxDistance = math.huge
+    playerBillboard.Parent = primaryPart
+    
+    local playerTextLabel = Instance.new("TextLabel")
+    playerTextLabel.Size = UDim2.new(1, 0, 1, 0)
+    playerTextLabel.BackgroundTransparency = 1
+    playerTextLabel.Text = model.Name -- Muestra el nombre del jugador
+    playerTextLabel.TextColor3 = espColor
+    playerTextLabel.TextScaled = true
+    playerTextLabel.Font = Enum.Font.SourceSansBold
+    playerTextLabel.Parent = playerBillboard
+    
+    -- Actualizar el tamaño del texto
+    updatePlayerTextSize(playerBillboard, primaryPart)
+
+    -- Conectar la actualización del tamaño del texto cada frame
+    game:GetService("RunService").RenderStepped:Connect(function()
+        updatePlayerTextSize(playerBillboard, primaryPart)
+    end)
+
+    playerEspObjects[model] = {playerBox, playerBillboard}
+    updatePlayerLists()
+end
+
+local function removePlayerEsp()
+    for model, objects in pairs(playerEspObjects) do
+        for _, obj in ipairs(objects) do
+            obj:Destroy()
+        end
+        playerEspObjects[model] = nil
+    end
+    updatePlayerLists()
+end
+
+-- Detectar si se añaden nuevos jugadores
+local function monitorPlayerEntities()
+    -- Verificar jugadores ya existentes al inicio
+    for _, model in ipairs(workspace.WORKSPACE_Entities.Players:GetChildren()) do
+        if model:IsA("Model") and model.Name ~= localPlayer.Name and not playerEspObjects[model] then
+            createPlayerEsp(model)
+        end
+    end
+
+    -- Escuchar si nuevos jugadores aparecen
+    game:GetService("RunService").Heartbeat:Connect(function()
+        if playerEspEnabled then
+            for _, model in ipairs(workspace.WORKSPACE_Entities.Players:GetChildren()) do
+                if model:IsA("Model") and model.Name ~= localPlayer.Name and not playerEspObjects[model] then
+                    createPlayerEsp(model)
+                end
+            end
+        end
+    end)
+end
+
+-- Botón para habilitar/deshabilitar ESP
+EspPlayerButton.MouseButton1Click:Connect(function()
+    playerEspEnabled = not playerEspEnabled
+    if playerEspEnabled then
+        monitorPlayerEntities() -- Comienza a monitorear jugadores
+    else
+        removePlayerEsp() -- Elimina el ESP de todos los jugadores
+    end
+end)
+
+
+
 EspsButton.MouseButton1Click:Connect(function()
     BackButton.Visible = true
     EspsButton.Visible = false
@@ -451,6 +737,8 @@ EspsButton.MouseButton1Click:Connect(function()
     MenuDeEsp.Visible = true
     EspCiervoButton.Visible = true
     EspBisonteButton.Visible = true
+    EspCocodriloButton.Visible = true
+    EspPlayerButton.Visible = true
 end)
 
 
@@ -464,6 +752,8 @@ BackButton.MouseButton1Click:Connect(function()
     MenuDeEsp.Visible = false
     EspCiervoButton.Visible = false
     EspBisonteButton.Visible = false
+    EspCocodriloButton.Visible = false
+    EspPlayerButton.Visible = false
 end)
 
 
@@ -473,8 +763,12 @@ CloseButton.MouseButton1Click:Connect(function()
     screenGui:Destroy()
     removeDeerEsp()
     removeBisonEsp()
+    removeCocodrileEsp()
+    removePlayerEsp()
     deerEspEnabled = false
     bisonEspEnabled = false
+    cocodrileEspEnabled = false
+    playerEspEnabled = false
 end)
 
 
@@ -490,6 +784,6 @@ wait(1)
 
 game.StarterGui:SetCore("SendNotification", {
     Title = "Leelo completo.";
-    Text = "Gracias por usar mi script, Para poder minimizarlo presiona *Alt* y para agrandarlo Presionalo de nuevo, eso es todo Gracias.";
+    Text = "Gracias por usar mi script, Para poder minimizarlo presiona *Alt* y para maximizarlo presionalo de nuevo, Eso es todo Gracias.";
     Duration = 10;
 })
