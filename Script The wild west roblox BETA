@@ -1,0 +1,495 @@
+local customMenu = game.CoreGui:FindFirstChild("CustomMenu")
+local toggleGui = game.Players.LocalPlayer.PlayerGui:FindFirstChild("ToggleGui")
+local walkWater = game.workspace:FindFirstChild("WalkWater")
+
+if customMenu or toggleGui then
+    if customMenu then
+        customMenu:Destroy()
+    end
+    if toggleGui then
+        toggleGui:Destroy()
+    end
+    wait(1.5) -- Espera solo si se eliminó algo
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+
+-- Configuración del ScreenGui
+ScreenGui.Parent = game.CoreGui
+ScreenGui.Name = "CustomMenu"
+ScreenGui.ResetOnSpawn = false
+
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Crear el ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "ToggleGui"
+screenGui.Parent = playerGui
+
+-- Crear el botón
+local toggleButton = Instance.new("ImageButton")
+toggleButton.Name = "ToggleButton"
+toggleButton.Parent = screenGui
+toggleButton.AnchorPoint = Vector2.new(0.5, 0.5) -- Corregido
+toggleButton.Size = UDim2.new(0.035, 0, 0.07, 0)
+toggleButton.Position = UDim2.new(0.1, 0, 0.5, 0) -- Ajusta la posición inicial si es necesario
+toggleButton.Image = "rbxassetid://128823460334294" -- Cambia este ID por el de tu imagen
+toggleButton.BackgroundTransparency = 1
+
+-- Referencia al Frame existente
+local frame = MainFrame -- Cambia "NombreDeTuFrame" por el nombre exacto de tu Frame
+
+toggleButton.Draggable = true
+toggleButton.Active = true
+
+-- Alternar visibilidad del Frame
+toggleButton.MouseButton1Click:Connect(function()
+    frame.Visible = not frame.Visible
+end)
+
+-- Configuración del MainFrame
+local MainFrame = Instance.new("Frame")
+MainFrame.Parent = ScreenGui
+MainFrame.AnchorPoint = Vector2.new(0.5, 0.5) -- Corregido
+MainFrame.Size = UDim2.new(0.44, 0, 0.455, 0) -- Menú más grande
+MainFrame.Position = UDim2.new(0.5, 0, 0.45, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+MainFrame.BorderSizePixel = 0
+MainFrame.Visible = true
+MainFrame.Active = true
+MainFrame.Draggable = true
+
+local MenuPrincipal = Instance.new("TextLabel")
+MenuPrincipal.Parent = MainFrame
+MenuPrincipal.AnchorPoint = Vector2.new(0.5, 0.5) -- Corregido
+MenuPrincipal.Size = UDim2.new(0.5, 0, 0.18, 0)
+MenuPrincipal.Position = UDim2.new(0.48, 0, 0.07, 0)
+MenuPrincipal.Text = "Menu Principal"
+MenuPrincipal.BackgroundTransparency = 1
+MenuPrincipal.TextColor3 = Color3.new(1, 1, 1)
+MenuPrincipal.Font = Enum.Font.SourceSansBold
+MenuPrincipal.TextSize = 25
+
+local MenuDeEsp = Instance.new("TextLabel")
+MenuDeEsp.Parent = MainFrame
+MenuDeEsp.AnchorPoint = Vector2.new(0.5, 0.5) -- Corregido
+MenuDeEsp.Size = UDim2.new(0.5, 0, 0.18, 0)
+MenuDeEsp.Position = UDim2.new(0.48, 0, 0.07, 0)
+MenuDeEsp.Text = "Menu De Esp"
+MenuDeEsp.BackgroundTransparency = 1
+MenuDeEsp.TextColor3 = Color3.new(1, 1, 1)
+MenuDeEsp.Font = Enum.Font.SourceSansBold
+MenuDeEsp.TextSize = 25
+MenuDeEsp.Visible = false
+
+-- Configuración de EspsButton
+local EspsButton = Instance.new("TextButton")
+EspsButton.Parent = MainFrame
+EspsButton.AnchorPoint = Vector2.new(0.5, 0.5) -- Corregido
+EspsButton.Size = UDim2.new(0.4, 0, 0.17, 0)
+EspsButton.Position = UDim2.new(0.23, 0, 0.26, 0)
+EspsButton.Text = "Esp"
+EspsButton.BackgroundColor3 = Color3.fromRGB(65, 65, 65)
+EspsButton.TextColor3 = Color3.new(1, 1, 1)
+EspsButton.Font = Enum.Font.SourceSansBold
+EspsButton.TextSize = 24
+
+-- Configuración de InfiniteYieldButton
+local InfiniteYieldButton = Instance.new("TextButton")
+InfiniteYieldButton.Parent = MainFrame
+InfiniteYieldButton.AnchorPoint = Vector2.new(0.5, 0.5) -- Corregido
+InfiniteYieldButton.Size = UDim2.new(0.4, 0, 0.17, 0)
+InfiniteYieldButton.Position = UDim2.new(0.67, 0, 0.26, 0)
+InfiniteYieldButton.Text = "Infinite Yield"
+InfiniteYieldButton.BackgroundColor3 = Color3.fromRGB(65, 65, 65)
+InfiniteYieldButton.TextColor3 = Color3.new(1, 1, 1)
+InfiniteYieldButton.Font = Enum.Font.SourceSansBold
+InfiniteYieldButton.TextSize = 24
+
+-- Crear el botón Server Hop debajo de AimLockBloxButton
+local RejoinButton = Instance.new("TextButton")
+RejoinButton.Name = "RejoinButton"
+RejoinButton.Size = UDim2.new(0.4, 0, 0.17, 0)
+RejoinButton.Position = UDim2.new(0.23, 0, 0.45, 0)
+RejoinButton.AnchorPoint = Vector2.new(0.5, 0.5) -- Asegura que el ancla esté centrada
+RejoinButton.Text = "Rejoin"
+RejoinButton.TextSize = 24
+RejoinButton.Font = Enum.Font.SourceSansBold
+RejoinButton.BackgroundColor3 = Color3.fromRGB(65, 65, 65) -- Mismo color de fondo
+RejoinButton.TextColor3 = Color3.new(1, 1, 1)
+RejoinButton.Parent = MainFrame
+
+local EspCiervoButton = Instance.new("TextButton")
+EspCiervoButton.Parent = MainFrame
+EspCiervoButton.AnchorPoint = Vector2.new(0.5, 0.5) -- Corregido
+EspCiervoButton.Size = UDim2.new(0.39, 0, 0.16, 0)
+EspCiervoButton.Position = UDim2.new(0.3, 0, 0.26, 0)
+EspCiervoButton.Text = "Esp De Ciervo"
+EspCiervoButton.BackgroundColor3 = Color3.fromRGB(65, 65, 65)
+EspCiervoButton.TextColor3 = Color3.new(1, 1, 1)
+EspCiervoButton.Font = Enum.Font.SourceSansBold
+EspCiervoButton.TextSize = 24
+EspCiervoButton.Visible = false
+
+local EspBisonteButton = Instance.new("TextButton")
+EspBisonteButton.Parent = MainFrame
+EspBisonteButton.AnchorPoint = Vector2.new(0.5, 0.5) -- Corregido
+EspBisonteButton.Size = UDim2.new(0.39, 0, 0.16, 0)
+EspBisonteButton.Position = UDim2.new(0.7, 0, 0.26, 0)
+EspBisonteButton.Text = "Esp De Bisonte"
+EspBisonteButton.BackgroundColor3 = Color3.fromRGB(65, 65, 65)
+EspBisonteButton.TextColor3 = Color3.new(1, 1, 1)
+EspBisonteButton.Font = Enum.Font.SourceSansBold
+EspBisonteButton.TextSize = 24
+EspBisonteButton.Visible = false
+
+-- Configuración de BackButton
+local BackButton = Instance.new("TextButton")
+BackButton.Parent = MainFrame
+BackButton.AnchorPoint = Vector2.new(0.5, 0.5) -- Corregido
+BackButton.Size = UDim2.new(0.085, 0, 0.16, 0)
+BackButton.Position = UDim2.new(0.05, 0, 0.1, 0)
+BackButton.Text = "<"
+BackButton.BackgroundColor3 = Color3.fromRGB(255, 85, 85)
+BackButton.TextColor3 = Color3.new(1, 1, 1)
+BackButton.Font = Enum.Font.SourceSansBold
+BackButton.TextSize = 20
+BackButton.Visible = false
+
+-- Configuración de CloseButton
+local CloseButton = Instance.new("TextButton")
+CloseButton.Parent = MainFrame
+CloseButton.AnchorPoint = Vector2.new(0.5, 0.5) -- Corregido
+CloseButton.Size = UDim2.new(0.085, 0, 0.16, 0)
+CloseButton.Position = UDim2.new(0.95, 0, 0.1, 0) -- Esquina superior derecha
+CloseButton.Text = "X"
+CloseButton.BackgroundColor3 = Color3.fromRGB(255, 85, 85)
+CloseButton.TextColor3 = Color3.new(1, 1, 1)
+CloseButton.Font = Enum.Font.SourceSansBold
+CloseButton.TextSize = 24
+CloseButton.Visible = true
+
+
+-- Funcionalidad del botón Infinite Yield
+InfiniteYieldButton.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+end)
+
+
+local queueteleport = (syn and syn.queue_on_teleport) or queue_on_teleport or (fluxus and fluxus.queue_on_teleport)
+
+local scriptToExecute = [[
+
+]]
+
+RejoinButton.MouseButton1Click:Connect(function()
+    if queueteleport then
+        queueteleport(scriptToExecute)
+    end
+
+    game.Players.LocalPlayer:Kick("\nRejoining...")
+    game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, game.Players.LocalPlayer)
+end)
+
+
+
+local deerEspEnabled = false
+local deerEspObjects = {}
+local deerWithEsp = {}
+local deerWithoutEsp = {}
+
+local deerPlayers = {} -- Lista de jugadores con ESP de ciervos
+local deerPlayer = game.Players.LocalPlayer
+local deerCamera = game.Workspace.CurrentCamera
+
+local DEER_MAX_TEXT_SIZE = 45 -- Tamaño máximo del texto para ciervos
+local DEER_MIN_TEXT_SIZE = 30 -- Tamaño mínimo del texto para ciervos
+local DEER_DISTANCE_THRESHOLD = 300 -- Distancia donde el texto es más pequeño
+
+local function updateDeerLists()
+    deerWithEsp = {}
+    deerWithoutEsp = {}
+    for _, model in ipairs(workspace.WORKSPACE_Entities.Animals:GetChildren()) do
+        if model:IsA("Model") and model.Name == "Deer" then
+            if deerEspObjects[model] then
+                table.insert(deerWithEsp, model)
+            else
+                table.insert(deerWithoutEsp, model)
+            end
+        end
+    end
+    print("Con ESP:", #deerWithEsp)
+    print("Sin ESP:", #deerWithoutEsp)
+end
+
+local function updateDeerTextSize(billboard, primaryPart)
+    local distance = (deerCamera.CFrame.Position - primaryPart.Position).magnitude
+    local sizeRatio = math.clamp(distance / DEER_DISTANCE_THRESHOLD, 0, 1)
+    local newSize = math.clamp(DEER_MIN_TEXT_SIZE + sizeRatio * (DEER_MAX_TEXT_SIZE - DEER_MIN_TEXT_SIZE), DEER_MIN_TEXT_SIZE, DEER_MAX_TEXT_SIZE)
+    billboard.Size = UDim2.new(0, newSize, 0, newSize)
+end
+
+local function createDeerEsp(model)
+    if not model:IsA("Model") then return end
+    local primaryPart = model.PrimaryPart or model:FindFirstChildWhichIsA("BasePart")
+    if not primaryPart then return end
+    
+    -- Crear la caja ESP para ciervos
+    local deerBox = Instance.new("BoxHandleAdornment")
+    deerBox.Size = primaryPart.Size + Vector3.new(1, 1, 1)
+    deerBox.Color3 = Color3.fromRGB(255, 255, 0) -- Amarillo
+    deerBox.Adornee = primaryPart
+    deerBox.AlwaysOnTop = true
+    deerBox.ZIndex = 5
+    deerBox.Transparency = 0.3
+    deerBox.Parent = primaryPart
+    
+    -- Crear el texto para ciervos
+    local deerBillboard = Instance.new("BillboardGui")
+    deerBillboard.Size = UDim2.new(0, DEER_MAX_TEXT_SIZE, 0, DEER_MAX_TEXT_SIZE)
+    deerBillboard.StudsOffset = Vector3.new(0, 5, 0)
+    deerBillboard.Adornee = primaryPart
+    deerBillboard.AlwaysOnTop = true
+    deerBillboard.MaxDistance = math.huge
+    deerBillboard.Parent = primaryPart
+    
+    local deerTextLabel = Instance.new("TextLabel")
+    deerTextLabel.Size = UDim2.new(1, 0, 1, 0)
+    deerTextLabel.BackgroundTransparency = 1
+    deerTextLabel.Text = "Ciervo"
+    deerTextLabel.TextColor3 = Color3.new(1, 1, 0) -- Amarillo
+    deerTextLabel.TextScaled = true
+    deerTextLabel.Font = Enum.Font.SourceSansBold
+    deerTextLabel.Parent = deerBillboard
+    
+    -- Actualizar el tamaño del texto
+    updateDeerTextSize(deerBillboard, primaryPart)
+
+    -- Conectar la actualización del tamaño del texto cada frame
+    game:GetService("RunService").RenderStepped:Connect(function()
+        updateDeerTextSize(deerBillboard, primaryPart)
+    end)
+
+    deerEspObjects[model] = {deerBox, deerBillboard}
+    updateDeerLists()
+end
+
+local function removeDeerEsp()
+    for model, objects in pairs(deerEspObjects) do
+        for _, obj in ipairs(objects) do
+            obj:Destroy()
+        end
+        deerEspObjects[model] = nil
+    end
+    updateDeerLists()
+end
+
+-- Detectar si se añaden nuevos "Deer"
+local function monitorDeerEntities()
+    -- Verificar por "Deer" ya existentes al principio
+    for _, model in ipairs(workspace.WORKSPACE_Entities.Animals:GetChildren()) do
+        if model:IsA("Model") and model.Name == "Deer" and not deerEspObjects[model] then
+            createDeerEsp(model)
+        end
+    end
+
+    -- Escuchar si nuevos "Deer" aparecen
+    game:GetService("RunService").Heartbeat:Connect(function()
+        if deerEspEnabled then
+            for _, model in ipairs(workspace.WORKSPACE_Entities.Animals:GetChildren()) do
+                if model:IsA("Model") and model.Name == "Deer" and not deerEspObjects[model] then
+                    createDeerEsp(model)
+                end
+            end
+        end
+    end)
+end
+
+-- Botón para habilitar/deshabilitar ESP
+EspCiervoButton.MouseButton1Click:Connect(function()
+    deerEspEnabled = not deerEspEnabled
+    if deerEspEnabled then
+        monitorDeerEntities() -- Comienza a monitorear los "Deer"
+    else
+        removeDeerEsp() -- Elimina el ESP de todos los "Deer"
+    end
+end)
+
+
+
+local bisonEspEnabled = false
+local bisonEspObjects = {}
+local bisonWithEsp = {}
+local bisonWithoutEsp = {}
+
+local bisonPlayers = {} -- Lista de jugadores con ESP de bisonte
+local bisonPlayer = game.Players.LocalPlayer
+local bisonCamera = game.Workspace.CurrentCamera
+
+local BISON_MAX_TEXT_SIZE = 45 -- Tamaño máximo del texto para bisonte
+local BISON_MIN_TEXT_SIZE = 30 -- Tamaño mínimo del texto para bisonte
+local BISON_DISTANCE_THRESHOLD = 300 -- Distancia donde el texto es más pequeño
+
+local function updateBisonLists()
+    bisonWithEsp = {}
+    bisonWithoutEsp = {}
+    for _, model in ipairs(workspace.WORKSPACE_Entities.Animals:GetChildren()) do
+        if model:IsA("Model") and model.Name == "Bison" then
+            if bisonEspObjects[model] then
+                table.insert(bisonWithEsp, model)
+            else
+                table.insert(bisonWithoutEsp, model)
+            end
+        end
+    end
+    print("Con ESP:", #bisonWithEsp)
+    print("Sin ESP:", #bisonWithoutEsp)
+end
+
+local function updateBisonTextSize(billboard, primaryPart)
+    local distance = (bisonCamera.CFrame.Position - primaryPart.Position).magnitude
+    local sizeRatio = math.clamp(distance / BISON_DISTANCE_THRESHOLD, 0, 1)
+    local newSize = math.clamp(BISON_MIN_TEXT_SIZE + sizeRatio * (BISON_MAX_TEXT_SIZE - BISON_MIN_TEXT_SIZE), BISON_MIN_TEXT_SIZE, BISON_MAX_TEXT_SIZE)
+    billboard.Size = UDim2.new(0, newSize, 0, newSize)
+end
+
+local function createBisonEsp(model)
+    if not model:IsA("Model") then return end
+    local primaryPart = model.PrimaryPart or model:FindFirstChildWhichIsA("BasePart")
+    if not primaryPart then return end
+    
+    -- Crear la caja ESP para bisonte
+    local bisonBox = Instance.new("BoxHandleAdornment")
+    bisonBox.Size = primaryPart.Size + Vector3.new(1, 1, 1)
+    bisonBox.Color3 = Color3.fromRGB(255, 255, 0) -- Amarillo
+    bisonBox.Adornee = primaryPart
+    bisonBox.AlwaysOnTop = true
+    bisonBox.ZIndex = 5
+    bisonBox.Transparency = 0.3
+    bisonBox.Parent = primaryPart
+    
+    -- Crear el texto para bisonte
+    local bisonBillboard = Instance.new("BillboardGui")
+    bisonBillboard.Size = UDim2.new(0, BISON_MAX_TEXT_SIZE, 0, BISON_MAX_TEXT_SIZE)
+    bisonBillboard.StudsOffset = Vector3.new(0, 5, 0)
+    bisonBillboard.Adornee = primaryPart
+    bisonBillboard.AlwaysOnTop = true
+    bisonBillboard.MaxDistance = math.huge
+    bisonBillboard.Parent = primaryPart
+    
+    local bisonTextLabel = Instance.new("TextLabel")
+    bisonTextLabel.Size = UDim2.new(1, 0, 1, 0)
+    bisonTextLabel.BackgroundTransparency = 1
+    bisonTextLabel.Text = "Bisonte"
+    bisonTextLabel.TextColor3 = Color3.new(1, 1, 0) -- Amarillo
+    bisonTextLabel.TextScaled = true
+    bisonTextLabel.Font = Enum.Font.SourceSansBold
+    bisonTextLabel.Parent = bisonBillboard
+    
+    -- Actualizar el tamaño del texto
+    updateBisonTextSize(bisonBillboard, primaryPart)
+
+    -- Conectar la actualización del tamaño del texto cada frame
+    game:GetService("RunService").RenderStepped:Connect(function()
+        updateBisonTextSize(bisonBillboard, primaryPart)
+    end)
+
+    bisonEspObjects[model] = {bisonBox, bisonBillboard}
+    updateBisonLists()
+end
+
+local function removeBisonEsp()
+    for model, objects in pairs(bisonEspObjects) do
+        for _, obj in ipairs(objects) do
+            obj:Destroy()
+        end
+        bisonEspObjects[model] = nil
+    end
+    updateBisonLists()
+end
+
+-- Detectar si se añaden nuevos "Bison"
+local function monitorBisonEntities()
+    -- Verificar por "Bison" ya existentes al principio
+    for _, model in ipairs(workspace.WORKSPACE_Entities.Animals:GetChildren()) do
+        if model:IsA("Model") and model.Name == "Bison" and not bisonEspObjects[model] then
+            createBisonEsp(model)
+        end
+    end
+
+    -- Escuchar si nuevos "Bison" aparecen
+    game:GetService("RunService").Heartbeat:Connect(function()
+        if bisonEspEnabled then
+            for _, model in ipairs(workspace.WORKSPACE_Entities.Animals:GetChildren()) do
+                if model:IsA("Model") and model.Name == "Bison" and not bisonEspObjects[model] then
+                    createBisonEsp(model)
+                end
+            end
+        end
+    end)
+end
+
+-- Botón para habilitar/deshabilitar ESP
+EspBisonteButton.MouseButton1Click:Connect(function()
+    bisonEspEnabled = not bisonEspEnabled
+    if bisonEspEnabled then
+        monitorBisonEntities() -- Comienza a monitorear los "Bison"
+    else
+        removeBisonEsp() -- Elimina el ESP de todos los "Bison"
+    end
+end)
+
+
+
+EspsButton.MouseButton1Click:Connect(function()
+    BackButton.Visible = true
+    EspsButton.Visible = false
+    InfiniteYieldButton.Visible = false
+    RejoinButton.Visible = false
+    MenuPrincipal.Visible = false
+    MenuDeEsp.Visible = true
+    EspCiervoButton.Visible = true
+    EspBisonteButton.Visible = true
+end)
+
+
+-- Funcionalidad del botón de regreso
+BackButton.MouseButton1Click:Connect(function()
+    BackButton.Visible = false
+    EspsButton.Visible = true
+    InfiniteYieldButton.Visible = true
+    RejoinButton.Visible = true
+    MenuPrincipal.Visible = true
+    MenuDeEsp.Visible = false
+    EspCiervoButton.Visible = false
+    EspBisonteButton.Visible = false
+end)
+
+
+-- Funcionalidad del botón de cierre (X)
+CloseButton.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+    screenGui:Destroy()
+    removeDeerEsp()
+    removeBisonEsp()
+    deerEspEnabled = false
+    bisonEspEnabled = false
+end)
+
+
+
+-- Controlar el cierre y apertura del menú
+game:GetService("UserInputService").InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.LeftAlt then
+        MainFrame.Visible = not MainFrame.Visible
+    end
+end)
+
+wait(1)
+
+game.StarterGui:SetCore("SendNotification", {
+    Title = "Leelo completo.";
+    Text = "Gracias por usar mi script, Para poder minimizarlo presiona *Alt* y para agrandarlo Presionalo de nuevo, eso es todo Gracias.";
+    Duration = 10;
+})
